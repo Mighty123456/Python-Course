@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS DevOps Deployment Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 1rem;
+    }
+    h1 { color: var(--accent); margin-bottom: 0.5rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .badge-success { background-color: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .badge-danger { background-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid #334155;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .status-item { background: #0f172a; padding: 1rem; border-radius: 8px; }
+    .status-item span { display: block; font-size: 0.85rem; color: var(--text-muted); }
+    .status-item strong { font-size: 1.1rem; color: var(--accent); }
+    ul { list-style: none; padding: 0; }
+    li {
+      padding: 0.75rem;
+      background: #0f172a;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>☁️ AWS DevOps Deployment Dashboard</h1>
+      <p>Express Frontend + Flask Backend Integration</p>
+    </header>
+
+    <div class="card">
+      <h2>Backend Connection Status</h2>
+      <p>
+        Status: 
+        <% if (backendStatus === 'Connected') { %>
+          <span class="badge badge-success">● Connected to Flask API</span>
+        <% } else { %>
+          <span class="badge badge-danger">✖ Backend Disconnected</span>
+        <% } %>
+      </p>
+      <p><small style="color: var(--text-muted);">Backend Target URL: <%= backendUrl %></small></p>
+    </div>
+
+    <% if (backendData) { %>
+      <div class="card">
+        <h2>Server Info</h2>
+        <div class="grid">
+          <div class="status-item">
+            <span>Service</span>
+            <strong><%= backendData.server_info.service || 'Flask REST API' %></strong>
+          </div>
+          <div class="status-item">
+            <span>Backend Hostname</span>
+            <strong><%= backendData.server_info.host %></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Deployment Tasks Overview</h2>
+        <ul>
+          <% backendData.items.forEach(function(item) { %>
+            <li>
+              <span><%= item.name %></span>
+              <strong style="color: var(--success);"><%= item.status %></strong>
+            </li>
+          <% }); %>
+        </ul>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
