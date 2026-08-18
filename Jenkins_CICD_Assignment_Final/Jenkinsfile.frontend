@@ -24,7 +24,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir("${APP_DIR}") {
-                    sh 'npm install --production=false'
+                    sh 'npm install --no-audit --no-fund'
                 }
             }
         }
