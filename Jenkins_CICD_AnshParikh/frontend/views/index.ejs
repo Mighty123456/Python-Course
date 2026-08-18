@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jenkins CI/CD Deployment Dashboard</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+    .card { background: #1e293b; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; }
+    h1 { color: #38bdf8; }
+    .ok { color: #22c55e; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🛠 Jenkins CI/CD Automated Deployment</h1>
+  <div class="card">
+    <h2>Backend Status</h2>
+    <p>Status: <span class="ok"><%= backendStatus %></span></p>
+    <p><small>Backend Target URL: <%= backendUrl %></small></p>
+  </div>
+</body>
+</html>

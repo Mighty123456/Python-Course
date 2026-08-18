@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+
+    environment {
+        PORT        = '3000'
+        BACKEND_URL = 'http://localhost:5000'
+        APP_DIR     = 'Jenkins_CICD_Assignment_Final/frontend'
+        APP_NAME    = 'express-frontend'
+    }
+
+    triggers {
+        githubPush()
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/Mighty123456/Python-Course.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh 'npm install --production=false'
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Deploy with pm2') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                        # Stop and delete any existing pm2 process
+                        pm2 stop ${APP_NAME} || true
+                        pm2 delete ${APP_NAME} || true
+
+                        # Start Express app under pm2
+                        PORT=${PORT} BACKEND_URL=${BACKEND_URL} \
+                        pm2 start server.js \
+                            --name ${APP_NAME} \
+                            --env production
+
+                        # Persist pm2 process list across reboots
+                        pm2 save
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                    sleep 3
+                    curl -f http://localhost:${PORT}/health || exit 1
+                    echo "Health check passed – Express frontend is live on port ${PORT}"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Express Frontend CI/CD Pipeline completed successfully!'
+            sh 'pm2 list'
+        }
+        failure {
+            echo '❌ Express Frontend Pipeline failed. Check console output above for details.'
+        }
+    }
+}

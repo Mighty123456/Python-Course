@@ -13,7 +13,7 @@ def add_cors(response):
 def index():
     return jsonify({
         "status": "running",
-        "service": "Flask Backend API (Automated CI/CD Deployment Tested)",
+        "service": "Flask Backend API",
         "hostname": socket.gethostname()
     })
 
