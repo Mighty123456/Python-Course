@@ -45,11 +45,9 @@ pipeline {
                         pm2 stop ${APP_NAME} || true
                         pm2 delete ${APP_NAME} || true
 
-                        # Start Express app under pm2
-                        PORT=${PORT} BACKEND_URL=${BACKEND_URL} \
-                        pm2 start server.js \
-                            --name ${APP_NAME} \
-                            --env production
+                        # Start Express app under pm2 with env vars
+                        PORT=${PORT} BACKEND_URL=${BACKEND_URL} NODE_ENV=production \
+                            pm2 start server.js --name ${APP_NAME}
 
                         # Persist pm2 process list across reboots
                         pm2 save
@@ -57,6 +55,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Verify Deployment') {
             steps {
