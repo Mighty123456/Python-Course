@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Terraform Infrastructure Dashboard</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+    .card { background: #1e293b; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #334155; }
+    h1 { color: #38bdf8; }
+    .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; }
+    .badge-success { background: rgba(34,197,94,0.2); color: #22c55e; }
+  </style>
+</head>
+<body>
+  <h1>☁️ Terraform AWS Infrastructure Dashboard</h1>
+  <p>Express Frontend ↔ Flask Backend Provisioned via IaC</p>
+
+  <div class="card">
+    <h2>Backend Status</h2>
+    <p>Status: <span class="badge badge-success"><%= backendStatus %></span></p>
+    <p><small>Backend Target URL: <%= backendUrl %></small></p>
+  </div>
+
+  <% if (backendData) { %>
+    <div class="card">
+      <h2>Server Information</h2>
+      <p>Host: <strong><%= backendData.server_info.host %></strong></p>
+    </div>
+
+    <div class="card">
+      <h2>Terraform Tasks Overview</h2>
+      <ul>
+        <% backendData.items.forEach(function(item) { %>
+          <li><%= item.name %> — <strong style="color: #22c55e;"><%= item.status %></strong></li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+</body>
+</html>

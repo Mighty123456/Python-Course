@@ -1,0 +1,36 @@
+================================================================================
+SCREENSHOT 2: kubectl apply output
+================================================================================
+Command:
+$ kubectl apply -f k8s/backend-deployment.yaml
+deployment.apps/flask-backend-deployment created
+service/flask-backend-service created
+
+$ kubectl apply -f k8s/frontend-deployment.yaml
+deployment.apps/express-frontend-deployment created
+service/express-frontend-service created
+
+================================================================================
+SCREENSHOT 3: kubectl get pods & services
+================================================================================
+Command:
+$ kubectl get pods
+NAME                                           READY   STATUS    RESTARTS   AGE
+express-frontend-deployment-6cf48dd46-6bzss   1/1     Running   0          3m12s
+express-frontend-deployment-6cf48dd46-pq72d   1/1     Running   0          3m12s
+flask-backend-deployment-6c689c9fd8-9xxfv     1/1     Running   0          3m12s
+flask-backend-deployment-6c689c9fd8-rzrsj     1/1     Running   0          3m12s
+
+$ kubectl get services
+NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+express-frontend-service   NodePort    10.101.120.234   <none>        3000:30080/TCP   3m12s
+flask-backend-service      ClusterIP   10.96.226.225    <none>        5000/TCP         3m12s
+kubernetes                 ClusterIP   10.96.0.1        <none>        443/TCP          6m25s
+
+================================================================================
+SCREENSHOT 4: minikube service url output
+================================================================================
+Command:
+$ minikube service express-frontend-service --url
+http://127.0.0.1:33781
+! Because you are using a Docker driver on linux, the terminal needs to be open to run it.

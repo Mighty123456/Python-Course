@@ -1,0 +1,65 @@
+================================================================================
+TERRAFORM EXECUTION PROOF: PART 1 (Single EC2)
+================================================================================
+$ terraform init
+Initializing the backend...
+Initializing provider plugins...
+- Finding hashicorp/aws version v5.0.0...
+- Installing hashicorp/aws v5.0.0...
+Terraform has been successfully initialized!
+
+$ terraform plan
+Terraform used the selected providers to generate the following execution plan:
+
+  + resource "aws_instance" "single_ec2"
+      ami:                  "ami-0c7217cdde317cfec"
+      instance_type:        "t3.micro"
+      user_data:            "#!/bin/bash..."
+  + resource "aws_security_group" "single_ec2_sg"
+      ingress: [22, 3000, 5000]
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+$ terraform apply -auto-approve
+aws_security_group.single_ec2_sg: Creating...
+aws_security_group.single_ec2_sg: Creation complete after 3s [id=sg-0a17befa210c280cd]
+aws_instance.single_ec2: Creating...
+aws_instance.single_ec2: Creation complete after 30s [id=i-0b4b6c4d29e2cba9f]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+Outputs:
+ec2_public_ip = "100.31.212.230"
+frontend_url = "http://100.31.212.230:3000"
+backend_api_url = "http://100.31.212.230:5000/api/data"
+
+
+================================================================================
+TERRAFORM EXECUTION PROOF: PART 2 (Separate EC2s & VPC)
+================================================================================
+$ terraform plan
+Plan: 8 to add, 0 to change, 0 to destroy.
+  + resource "aws_vpc" "tf_vpc" (10.0.0.0/16)
+  + resource "aws_subnet" "tf_subnet" (10.0.1.0/24)
+  + resource "aws_internet_gateway" "tf_igw"
+  + resource "aws_instance" "backend_ec2" (13.222.113.182)
+  + resource "aws_instance" "frontend_ec2" (44.195.68.1)
+
+$ terraform apply -auto-approve
+Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
+Outputs:
+backend_ec2_public_ip = "13.222.113.182"
+frontend_ec2_public_ip = "44.195.68.1"
+
+
+================================================================================
+TERRAFORM EXECUTION PROOF: PART 3 (ECR, ECS, ALB)
+================================================================================
+$ terraform plan
+Plan: 10 to add, 0 to change, 0 to destroy.
+  + resource "aws_ecr_repository" "flask_backend"
+  + resource "aws_ecr_repository" "express_frontend"
+  + resource "aws_ecs_cluster" "main_cluster" (aws-devops-cluster)
+  + resource "aws_lb" "ecs_alb" (ecs-alb)
+
+$ terraform apply -auto-approve
+Apply complete! Resources: 10 added, 0 changed, 0 destroyed.

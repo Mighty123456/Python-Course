@@ -1,0 +1,89 @@
+pipeline {
+    agent any
+
+    environment {
+        PORT        = '5000'
+        FLASK_ENV   = 'production'
+        APP_DIR     = 'Jenkins_CICD_Assignment_Final/backend'
+        APP_NAME    = 'flask-backend'
+    }
+
+    triggers {
+        githubPush()
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/Mighty123456/Python-Course.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                        python3 -m venv venv
+                        ./venv/bin/pip install --upgrade pip
+                        ./venv/bin/pip install -r requirements.txt
+                        ./venv/bin/pip install gunicorn
+                    '''
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh './venv/bin/python -m unittest discover -s . -p "test_*.py" -v'
+                }
+            }
+        }
+
+        stage('Deploy with pm2') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                        # Stop and delete any existing pm2 process
+                        pm2 stop ${APP_NAME} || true
+                        pm2 delete ${APP_NAME} || true
+
+                        # Start Flask app under pm2 using gunicorn
+                        pm2 start venv/bin/gunicorn \
+                            --name ${APP_NAME} \
+                            --interpreter none \
+                            -- \
+                            -w 2 \
+                            -b 0.0.0.0:${PORT} \
+                            app:app
+
+                        # Persist pm2 process list across reboots
+                        pm2 save
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                    sleep 3
+                    curl -f http://localhost:${PORT}/api/health || exit 1
+                    echo "Health check passed – Flask backend is live on port ${PORT}"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Flask Backend CI/CD Pipeline completed successfully!'
+            sh 'pm2 list'
+        }
+        failure {
+            echo '❌ Flask Backend Pipeline failed. Check console output above for details.'
+        }
+    }
+}

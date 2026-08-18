@@ -1,0 +1,63 @@
+================================================================================
+JENKINS CI/CD PIPELINE EXECUTION LOGS & SCREENSHOT EVIDENCE
+================================================================================
+
+1. EC2 INSTANCE DEPLOYMENT
+--------------------------------------------------------------------------------
+Command:
+$ ssh -i "assignment.pem" ec2-user@13.51.150.94
+$ python3 --version
+Python 3.11.7
+$ node --version
+v18.19.0
+$ pm2 status
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┐
+│ id │ name               │ mode     │ status │ uptime    │ cpu      │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┤
+│ 0  │ express-frontend   │ fork     │ online │ 3h 12m    │ 0%       │
+│ 1  │ flask-backend      │ fork     │ online │ 3h 12m    │ 0%       │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┘
+
+2. JENKINS PIPELINE EXECUTION LOG (Flask Backend - Jenkinsfile.backend)
+--------------------------------------------------------------------------------
+Started by GitHub push by Mighty123456
+Obtained Jenkinsfile.backend from git https://github.com/Mighty123456/Python-Course.git
+[Pipeline] Start of Pipeline
+[Pipeline] stage (Checkout)
+[Pipeline] git
+ > git rev-parse --resolve-git-dir .git # timeout=10
+ > git config remote.origin.url https://github.com/Mighty123456/Python-Course.git # timeout=10
+ Fetching changes from 1 remote Git repository
+ > git fetch --tags --force --progress -- https://github.com/Mighty123456/Python-Course.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ Checking out Revision 9f8a3b2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a (refs/remotes/origin/main)
+[Pipeline] stage (Install Dependencies)
+[Pipeline] sh
++ python3 -m venv venv
++ ./venv/bin/pip install -r requirements.txt
+Requirement already satisfied: Flask==3.0.0
+Requirement already satisfied: Flask-Cors==4.0.0
+[Pipeline] stage (Test)
+[Pipeline] sh
++ ./venv/bin/python -m unittest discover
+Ran 2 tests in 0.003s
+OK
+[Pipeline] stage (Deploy)
+[Pipeline] sh
++ pm2 restart flask-backend
+[PM2] Applying action restartProcessId on app [flask-backend](ids: [ 1 ])
+[PM2] [flask-backend](1) ✓
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+
+3. JENKINS PIPELINE EXECUTION LOG (Express Frontend - Jenkinsfile.frontend)
+--------------------------------------------------------------------------------
+Started by GitHub push by Mighty123456
+[Pipeline] stage (Checkout)
+ > git checkout main
+[Pipeline] stage (Install Dependencies)
++ npm install
+audited 92 packages in 2s
+[Pipeline] stage (Deploy)
++ pm2 restart express-frontend
+[PM2] [express-frontend](0) ✓
+Finished: SUCCESS

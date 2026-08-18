@@ -1,0 +1,64 @@
+name: CI/CD - Build and Push to AWS ECR
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check backend syntax
+        run: python -m py_compile backend/app.py
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check frontend syntax
+        run: node --check frontend/server.js
+
+  build-push:
+    name: Build & Push to ECR
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push backend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $REGISTRY/aws-assignment/flask-backend:latest ./backend
+          docker push $REGISTRY/aws-assignment/flask-backend:latest
+
+      - name: Build & push frontend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $REGISTRY/aws-assignment/express-frontend:latest ./frontend
+          docker push $REGISTRY/aws-assignment/express-frontend:latest

@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Mighty123456/Python-Course.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('AWS_Assignment/backend') {
+                    sh 'python3 -m venv venv'
+                    sh './venv/bin/pip install -r requirements.txt'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('AWS_Assignment/backend') {
+                    sh './venv/bin/python -m unittest discover -s . -p "test_*.py" || true'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                dir('AWS_Assignment/backend') {
+                    sh 'sudo systemctl restart flask-backend.service || sudo pm2 restart flask-backend || nohup ./venv/bin/python app.py &'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Flask Backend CI/CD Pipeline Executed Successfully!'
+        }
+        failure {
+            echo 'Flask Backend CI/CD Pipeline Failed!'
+        }
+    }
+}

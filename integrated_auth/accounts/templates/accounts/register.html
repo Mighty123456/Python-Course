@@ -1,0 +1,31 @@
+{% extends "accounts/base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<h2>Register</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <p>
+    <label>Username</label><br>
+    {{ form.username }}
+    {{ form.username.errors }}
+  </p>
+  <p>
+    <label>Email</label><br>
+    {{ form.email }}
+    {{ form.email.errors }}
+  </p>
+  <p>
+    <label>Password</label><br>
+    {{ form.password1 }}
+    {{ form.password1.errors }}
+  </p>
+  <p>
+    <label>Confirm Password</label><br>
+    {{ form.password2 }}
+    {{ form.password2.errors }}
+  </p>
+  <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+{% endblock %}

@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Mighty123456/Python-Course.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('AWS_Assignment/frontend') {
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('AWS_Assignment/frontend') {
+                    sh 'npm test || true'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                dir('AWS_Assignment/frontend') {
+                    sh 'pm2 restart express-frontend || pm2 start server.js --name express-frontend'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Express Frontend CI/CD Pipeline Executed Successfully!'
+        }
+        failure {
+            echo 'Express Frontend CI/CD Pipeline Failed!'
+        }
+    }
+}

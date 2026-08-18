@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kubernetes Deployment Dashboard</title>
+  <style>
+    body { font-family: sans-serif; background: #111827; color: #f9fafc; padding: 2rem; }
+    .card { background: #1f2937; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #374151; }
+    h1 { color: #60a5fa; }
+    .status-ok { color: #4ade80; font-weight: bold; }
+    .status-err { color: #f87171; font-weight: bold; }
+    ul { list-style-type: square; }
+  </style>
+</head>
+<body>
+  <h1>☸️ Kubernetes Pod Dashboard</h1>
+  <p>Minikube Pod Orchestration & Service Discovery</p>
+
+  <div class="card">
+    <h2>Backend Status</h2>
+    <p>
+      Status: 
+      <% if (backendStatus === 'Connected') { %>
+        <span class="status-ok">● Connected to Flask Service</span>
+      <% } else { %>
+        <span class="status-err">✖ Backend Disconnected</span>
+      <% } %>
+    </p>
+    <p><small>Internal Target URL: <%= backendUrl %></small></p>
+  </div>
+
+  <% if (backendData) { %>
+    <div class="card">
+      <h2>Pod Information</h2>
+      <p>Backend Pod Name: <strong><%= backendData.pod %></strong></p>
+    </div>
+
+    <div class="card">
+      <h2>Kubernetes Tasks</h2>
+      <ul>
+        <% backendData.items.forEach(function(item) { %>
+          <li><%= item.task %> — <span class="status-ok"><%= item.status %></span></li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+</body>
+</html>
