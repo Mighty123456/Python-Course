@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Express Frontend for Jenkins CI/CD Assignment",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "test": "node --test test_server.js"
